@@ -1,0 +1,6 @@
+[server]
+address = "localhost:8080"
+
+[web]
+http = "1.1"
+directory = "${HOME}/development/turbine/tests/http"
