@@ -5,8 +5,10 @@ use std::{
     thread,
 };
 
+const SERVER_ADDR: &str = "localhost:8080";
+
 fn main() {
-    let tcp = TcpListener::bind("localhost:8080").unwrap();
+    let tcp = TcpListener::bind(SERVER_ADDR).unwrap();
 
     for incoming in tcp.incoming() {
         thread::spawn(|| handle_request(incoming.unwrap()));
@@ -14,7 +16,7 @@ fn main() {
 }
 
 fn handle_request(mut stream: TcpStream) {
-    let mut buf = [0; 24000];
+    let mut buf = [0; 1024];
     stream.read(&mut buf).unwrap();
 
     let response_data = parse_status_line(&mut buf);
