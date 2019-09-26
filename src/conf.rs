@@ -3,7 +3,7 @@ extern crate toml;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
-struct Config {
+pub struct Config {
     server: Server,
     web: Web,
 }
