@@ -8,6 +8,17 @@ struct Config {
     web: Web,
 }
 
+#[allow(dead_code)]
+impl Config {
+    fn ser(&self) -> String {
+        toml::to_string(self).unwrap()
+    }
+
+    pub fn from(ser: String) -> Config {
+        toml::from_str::<Config>(&ser).unwrap()
+    }
+}
+
 #[derive(Serialize, Deserialize)]
 struct Server {
     address: String,
@@ -27,7 +38,7 @@ mod tests {
     #[test]
     fn config_deserialize() {
         let some_toml = given_example_conf();
-        let actual_conf = toml::from_str::<Config>(&some_toml).unwrap();
+        let actual_conf = Config::from(some_toml);
         let expect_conf = given_conf();
 
         assert_eq!(actual_conf.server.address, expect_conf.server.address);
@@ -37,7 +48,7 @@ mod tests {
 
     #[test]
     fn config_serialize() {
-        let actual_conf = toml::to_string::<Config>(&given_conf()).unwrap();
+        let actual_conf = given_conf().ser();
         let expected_toml = given_example_conf();
 
         assert_eq!(actual_conf.trim(), expected_toml.trim());
