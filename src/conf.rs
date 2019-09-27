@@ -2,10 +2,10 @@ extern crate serde;
 extern crate toml;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Config {
-    server: Server,
-    web: Web,
+    pub server: Server,
+    pub web: Web,
 }
 
 #[allow(dead_code)]
@@ -19,15 +19,15 @@ impl Config {
     }
 }
 
-#[derive(Serialize, Deserialize)]
-struct Server {
-    address: String,
+#[derive(Serialize, Deserialize, Clone)]
+pub struct Server {
+    pub address: String,
 }
 
-#[derive(Serialize, Deserialize)]
-struct Web {
-    http: String,
-    directory: String,
+#[derive(Serialize, Deserialize, Clone)]
+pub struct Web {
+    pub http: String,
+    pub directory: String,
 }
 
 #[cfg(test)]
@@ -55,7 +55,7 @@ mod tests {
     }
 
     fn given_example_conf() -> String {
-        fs::read_to_string("tests/example-conf.toml").unwrap()
+        fs::read_to_string("tests/example_conf.toml").unwrap()
     }
 
     fn given_conf() -> Config {

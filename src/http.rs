@@ -6,20 +6,22 @@ pub mod tcp {
         thread,
         thread::JoinHandle,
     };
+    use crate::conf::Config;
 
-    pub fn start_server(address: String) -> TcpListener {
-        TcpListener::bind(address).unwrap()
+    pub fn start_server(config: Config) -> TcpListener {
+        TcpListener::bind(config.server.address).unwrap()
     }
 
-    pub fn listen(tcp: TcpListener) -> JoinHandle<()> {
+    pub fn listen(tcp: TcpListener, config: Config) -> JoinHandle<()> {
         thread::spawn(move || {
             for stream in tcp.incoming() {
-                thread::spawn(|| handle_stream(&mut stream.unwrap()));
+                let cloned_config = config.clone();
+                thread::spawn(move || handle_stream(&mut stream.unwrap(), cloned_config));
             }
         })
     }
 
-    fn handle_stream(stream: &mut TcpStream) {
+    fn handle_stream(stream: &mut TcpStream, config: Config) {
         stream.flush().unwrap();
     }
 
