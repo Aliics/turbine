@@ -40,7 +40,11 @@ pub mod tcp {
         };
         let split_path: Vec<&str> = dropped_params.split(".").collect();
         let last_index = split_path.len() - 1;
-        split_path[last_index].to_string()
+        if last_index > 0 {
+            split_path[last_index].to_string()
+        } else {
+            String::new()
+        }
     }
 
     #[cfg(test)]
@@ -74,6 +78,15 @@ pub mod tcp {
             let actual_ext = get_path_file_ext(path);
 
             assert_eq!(actual_ext, "css");
+        }
+
+        #[test]
+        fn getting_blank_file_ext() {
+            let path = "home".to_string();
+
+            let actual_ext = get_path_file_ext(path);
+
+            assert_eq!(actual_ext, String::new());
         }
     }
 }
