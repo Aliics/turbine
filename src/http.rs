@@ -1,6 +1,12 @@
+mod response {
+    pub const HTTP_OK: &str = "HTTP/1.1 200 OK";
+    pub const HTTP_NOT_FOUND: &str = "HTTP/1.1 404 Not Found\r\n\r\nNothing here! Oh noes!";
+}
+
 #[allow(dead_code)]
 pub mod tcp {
     use crate::conf::Config;
+    use crate::http::response::{HTTP_NOT_FOUND, HTTP_OK};
     use std::{
         fs,
         io::{Read, Write},
@@ -8,9 +14,6 @@ pub mod tcp {
         thread,
         thread::JoinHandle,
     };
-
-    const HTTP_OK: &str = "HTTP/1.1 200 OK";
-    const HTTP_NOT_FOUND: &str = "HTTP/1.1 404 Not Found\r\n\r\n";
 
     pub fn start_server(config: Config) -> TcpListener {
         TcpListener::bind(config.server.address).unwrap()
