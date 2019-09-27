@@ -9,7 +9,7 @@ pub mod tcp {
         thread::JoinHandle,
     };
 
-    const HTTP_OK: &str = "HTTP/1.1 200 OK\r\n";
+    const HTTP_OK: &str = "HTTP/1.1 200 OK";
     const HTTP_NOT_FOUND: &str = "HTTP/1.1 404 Not Found\r\n\r\n";
 
     pub fn start_server(config: Config) -> TcpListener {
@@ -35,8 +35,11 @@ pub mod tcp {
         let mut directory_clone = config.web.directory.clone();
         directory_clone.push_str(status_line.1.as_str());
 
+        let file_ext = get_path_file_ext(status_line.1);
+        let ct_header = format!("Content-Type: text/{}", file_ext);
+
         let response = match fs::read_to_string(directory_clone) {
-            Ok(data) => format!("{}\r\n{}", HTTP_OK, data),
+            Ok(data) => format!("{}\r\n{}\r\n\r\n{}", HTTP_OK, ct_header, data),
             Err(_) => HTTP_NOT_FOUND.to_string(),
         };
 
