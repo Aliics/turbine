@@ -1,12 +1,16 @@
 #[allow(dead_code)]
 pub mod tcp {
+    use crate::conf::Config;
     use std::{
-        io::Write,
+        fs,
+        io::{Read, Write},
         net::{TcpListener, TcpStream},
         thread,
         thread::JoinHandle,
     };
-    use crate::conf::Config;
+
+    const HTTP_OK: &str = "HTTP/1.1 200 OK\r\n";
+    const HTTP_NOT_FOUND: &str = "HTTP/1.1 404 Not Found\r\n\r\n";
 
     pub fn start_server(config: Config) -> TcpListener {
         TcpListener::bind(config.server.address).unwrap()
@@ -22,6 +26,21 @@ pub mod tcp {
     }
 
     fn handle_stream(stream: &mut TcpStream, config: Config) {
+        let mut buf = [0; 1024];
+        stream.read(&mut buf).unwrap();
+
+        let request_str = String::from_utf8_lossy(&mut buf).to_string();
+        let status_line = parse_status_line(request_str);
+
+        let mut directory_clone = config.web.directory.clone();
+        directory_clone.push_str(status_line.1.as_str());
+
+        let response = match fs::read_to_string(directory_clone) {
+            Ok(data) => format!("{}\r\n{}", HTTP_OK, data),
+            Err(_) => HTTP_NOT_FOUND.to_string(),
+        };
+
+        stream.write(response.as_bytes()).unwrap();
         stream.flush().unwrap();
     }
 
